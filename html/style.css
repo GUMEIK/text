@@ -1,0 +1,282 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f5f5f5;
+}
+
+.container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: #2c3e50;
+    font-size: 1.8rem;
+}
+
+/* 标签页样式 */
+.tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 0.5rem;
+}
+
+.tab-btn {
+    padding: 0.8rem 1.5rem;
+    border: none;
+    background: none;
+    color: #666;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    border-radius: 6px;
+}
+
+.tab-btn:hover {
+    background-color: #f0f0f0;
+}
+
+.tab-btn.active {
+    color: #3498db;
+    background-color: #ebf5fb;
+    font-weight: 500;
+}
+
+.tab-content {
+    margin-bottom: 1.5rem;
+}
+
+.tab-content.hidden {
+    display: none;
+}
+
+/* 文件上传区域 */
+.upload-section {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.file-input {
+    display: none;
+}
+
+.file-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.5rem;
+    background-color: #3498db;
+    color: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.file-label:hover {
+    background-color: #2980b9;
+}
+
+/* 文本输入区域 */
+.text-input-section {
+    margin-bottom: 1.5rem;
+}
+
+#textInput {
+    width: 100%;
+    min-height: 200px;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+    resize: vertical;
+    font-family: inherit;
+}
+
+/* 密钥输入区域 */
+.key-section {
+    margin-bottom: 1.5rem;
+}
+
+.key-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.key-input {
+    width: 100%;
+    padding: 0.8rem;
+    padding-right: 40px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+.key-input:focus {
+    border-color: #3498db;
+    outline: none;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+}
+
+/* 按钮组 */
+.button-group {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+.btn-encrypt {
+    background-color: #2ecc71;
+    color: #fff;
+}
+
+.btn-encrypt:hover {
+    background-color: #27ae60;
+}
+
+.btn-decrypt {
+    background-color: #e74c3c;
+    color: #fff;
+}
+
+.btn-decrypt:hover {
+    background-color: #c0392b;
+}
+
+.btn-test {
+    background-color: #95a5a6;
+    color: #fff;
+}
+
+.btn-test:hover {
+    background-color: #7f8c8d;
+}
+
+.btn-download {
+    background-color: #9b59b6;
+    color: #fff;
+}
+
+.btn-download:hover {
+    background-color: #8e44ad;
+}
+
+/* 图标样式 */
+.upload-icon, .test-icon, .eye-icon, .lock-icon, .unlock-icon, .copy-icon, .download-icon {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+}
+
+/* 预览和结果区域 */
+.preview-section, .result-section {
+    margin-top: 2rem;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+h2 {
+    color: #2c3e50;
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+.preview-controls, .result-controls {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-icon {
+    padding: 0.5rem;
+    background: none;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-icon:hover {
+    background-color: #f8f9fa;
+    border-color: #aaa;
+}
+
+.preview-content, .result-content {
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    min-height: 200px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    background-color: #f8f9fa;
+    font-family: monospace;
+    line-height: 1.5;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .container {
+        margin: 1rem;
+        padding: 1rem;
+    }
+
+    .upload-section {
+        flex-direction: column;
+    }
+
+    .file-label, .btn-test {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .button-group {
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
