@@ -2,7 +2,7 @@
   "name": "Markdown 文件加密/解密工具",
   "short_name": "MD加密工具",
   "description": "一个安全的Markdown文件加密和解密工具",
-  "start_url": "/",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#4a90e2",

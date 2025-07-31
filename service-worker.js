@@ -7,7 +7,14 @@ const ASSETS_TO_CACHE = [
   './html/script.js',
   './icons/icon-192.svg',
   './icons/icon-512.svg'
-];
+].map(path => {
+  // 检测是否在GitHub Pages环境
+  if (self.location.hostname.includes('github.io')) {
+    // 如果是GitHub Pages环境，添加/text前缀
+    return `/text${path.startsWith('./') ? path.slice(1) : path}`;
+  }
+  return path;
+});
 
 // 预缓存静态资源
 self.addEventListener('install', (event) => {

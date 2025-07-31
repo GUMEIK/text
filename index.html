@@ -105,12 +105,22 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/service-worker.js')
+                // 检测当前环境
+                const isGitHubPages = window.location.hostname.includes('github.io');
+                const basePath = isGitHubPages ? '/text' : '';
+                
+                // 配置Service Worker注册选项
+                const swOptions = {
+                    scope: isGitHubPages ? '/text/' : '/'
+                };
+
+                // 使用相对路径注册service-worker.js
+                navigator.serviceWorker.register('./service-worker.js', swOptions)
                     .then(registration => {
-                        console.log('ServiceWorker registration successful');
+                        console.log('ServiceWorker registration successful with scope:', registration.scope);
                     })
                     .catch(err => {
-                        console.log('ServiceWorker registration failed: ', err);
+                        console.error('ServiceWorker registration failed:', err);
                     });
             });
         }
