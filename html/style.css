@@ -1,3 +1,32 @@
+:root {
+    --primary-color: #3498db;
+    --primary-dark: #2980b9;
+    --success-color: #2ecc71;
+    --success-dark: #27ae60;
+    --danger-color: #e74c3c;
+    --danger-dark: #c0392b;
+    --purple-color: #9b59b6;
+    --purple-dark: #8e44ad;
+    --text-color: #2c3e50;
+    --text-light: #666;
+    --bg-color: #f5f5f5;
+    --bg-light: #fff;
+    --border-color: #ddd;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s ease;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --text-color: #ecf0f1;
+        --text-light: #bdc3c7;
+        --bg-color: #2c3e50;
+        --bg-light: #34495e;
+        --border-color: #465670;
+        --shadow-color: rgba(0, 0, 0, 0.3);
+    }
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -7,32 +36,35 @@
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     line-height: 1.6;
-    color: #333;
-    background-color: #f5f5f5;
+    color: var(--text-color);
+    background-color: var(--bg-color);
+    transition: var(--transition);
+    min-height: 100vh;
 }
 
 .container {
     max-width: 800px;
     margin: 2rem auto;
     padding: 2rem;
-    background-color: #fff;
+    background-color: var(--bg-light);
     border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 20px var(--shadow-color);
+    transition: var(--transition);
 }
 
 h1 {
     text-align: center;
     margin-bottom: 2rem;
-    color: #2c3e50;
+    color: var(--text-color);
     font-size: 1.8rem;
+    font-weight: 600;
 }
 
-/* 标签页样式 */
 .tabs {
     display: flex;
     gap: 1rem;
     margin-bottom: 1.5rem;
-    border-bottom: 2px solid #eee;
+    border-bottom: 2px solid var(--border-color);
     padding-bottom: 0.5rem;
 }
 
@@ -40,32 +72,51 @@ h1 {
     padding: 0.8rem 1.5rem;
     border: none;
     background: none;
-    color: #666;
+    color: var(--text-light);
     cursor: pointer;
     font-size: 1rem;
-    transition: all 0.3s ease;
+    transition: var(--transition);
     border-radius: 6px;
+    position: relative;
+}
+
+.tab-btn::after {
+    content: '';
+    position: absolute;
+    bottom: -0.5rem;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: var(--primary-color);
+    transform: scaleX(0);
+    transition: var(--transition);
 }
 
 .tab-btn:hover {
-    background-color: #f0f0f0;
+    color: var(--primary-color);
 }
 
 .tab-btn.active {
-    color: #3498db;
-    background-color: #ebf5fb;
-    font-weight: 500;
+    color: var(--primary-color);
+}
+
+.tab-btn.active::after {
+    transform: scaleX(1);
 }
 
 .tab-content {
     margin-bottom: 1.5rem;
+    opacity: 1;
+    transform: translateY(0);
+    transition: var(--transition);
 }
 
 .tab-content.hidden {
     display: none;
+    opacity: 0;
+    transform: translateY(20px);
 }
 
-/* 文件上传区域 */
 .upload-section {
     display: flex;
     gap: 1rem;
@@ -82,18 +133,22 @@ h1 {
     align-items: center;
     gap: 0.5rem;
     padding: 0.8rem 1.5rem;
-    background-color: #3498db;
+    background-color: var(--primary-color);
     color: #fff;
     border-radius: 6px;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: var(--transition);
+    box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+    width: 100%;
+    justify-content: center;
 }
 
 .file-label:hover {
-    background-color: #2980b9;
+    background-color: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
 }
 
-/* 文本输入区域 */
 .text-input-section {
     margin-bottom: 1.5rem;
 }
@@ -102,14 +157,22 @@ h1 {
     width: 100%;
     min-height: 200px;
     padding: 1rem;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-color);
     border-radius: 6px;
     font-size: 1rem;
     resize: vertical;
     font-family: inherit;
+    background-color: var(--bg-light);
+    color: var(--text-color);
+    transition: var(--transition);
 }
 
-/* 密钥输入区域 */
+#textInput:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
 .key-section {
     margin-bottom: 1.5rem;
 }
@@ -124,15 +187,18 @@ h1 {
     width: 100%;
     padding: 0.8rem;
     padding-right: 40px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-color);
     border-radius: 6px;
     font-size: 1rem;
-    transition: border-color 0.3s;
+    transition: var(--transition);
+    background-color: var(--bg-light);
+    color: var(--text-color);
 }
 
 .key-input:focus {
-    border-color: #3498db;
+    border-color: var(--primary-color);
     outline: none;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
 }
 
 .toggle-password {
@@ -142,9 +208,14 @@ h1 {
     border: none;
     cursor: pointer;
     padding: 5px;
+    color: var(--text-light);
+    transition: var(--transition);
 }
 
-/* 按钮组 */
+.toggle-password:hover {
+    color: var(--primary-color);
+}
+
 .button-group {
     display: flex;
     gap: 1rem;
@@ -160,55 +231,87 @@ h1 {
     border-radius: 6px;
     cursor: pointer;
     font-size: 1rem;
-    transition: all 0.3s;
+    transition: var(--transition);
+    box-shadow: 0 2px 8px var(--shadow-color);
+    flex: 1;
+    justify-content: center;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px var(--shadow-color);
 }
 
 .btn-encrypt {
-    background-color: #2ecc71;
+    background-color: var(--success-color);
     color: #fff;
 }
 
 .btn-encrypt:hover {
-    background-color: #27ae60;
+    background-color: var(--success-dark);
 }
 
 .btn-decrypt {
-    background-color: #e74c3c;
+    background-color: var(--danger-color);
     color: #fff;
 }
 
 .btn-decrypt:hover {
-    background-color: #c0392b;
-}
-
-.btn-test {
-    background-color: #95a5a6;
-    color: #fff;
-}
-
-.btn-test:hover {
-    background-color: #7f8c8d;
+    background-color: var(--danger-dark);
 }
 
 .btn-download {
-    background-color: #9b59b6;
+    background-color: var(--purple-color);
     color: #fff;
+    position: relative;
+    overflow: hidden;
 }
 
 .btn-download:hover {
-    background-color: #8e44ad;
+    background-color: var(--purple-dark);
 }
 
-/* 图标样式 */
+.btn-download::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    border-radius: 100%;
+    transform: scale(1, 1) translate(-50%);
+    transform-origin: 50% 50%;
+}
+
+.btn-download:active::after {
+    animation: ripple 0.6s ease-out;
+}
+
+@keyframes ripple {
+    0% {
+        transform: scale(0, 0);
+        opacity: 0.5;
+    }
+    100% {
+        transform: scale(20, 20);
+        opacity: 0;
+    }
+}
+
 .upload-icon, .test-icon, .eye-icon, .lock-icon, .unlock-icon, .copy-icon, .download-icon {
     width: 20px;
     height: 20px;
     fill: currentColor;
+    transition: var(--transition);
 }
 
-/* 预览和结果区域 */
 .preview-section, .result-section {
     margin-top: 2rem;
+    opacity: 1;
+    transform: translateY(0);
+    transition: var(--transition);
 }
 
 .section-header {
@@ -219,7 +322,7 @@ h1 {
 }
 
 h2 {
-    color: #2c3e50;
+    color: var(--text-color);
     font-size: 1.2rem;
     font-weight: 500;
 }
@@ -232,43 +335,72 @@ h2 {
 .btn-icon {
     padding: 0.5rem;
     background: none;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-color);
     border-radius: 4px;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: var(--transition);
+    color: var(--text-light);
 }
 
 .btn-icon:hover {
-    background-color: #f8f9fa;
-    border-color: #aaa;
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #fff;
+    transform: translateY(-1px);
 }
 
 .preview-content, .result-content {
     padding: 1rem;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-color);
     border-radius: 6px;
     min-height: 200px;
     white-space: pre-wrap;
     word-break: break-word;
-    background-color: #f8f9fa;
-    font-family: monospace;
+    background-color: var(--bg-light);
+    color: var(--text-color);
+    font-family: 'Fira Code', 'Consolas', monospace;
     line-height: 1.5;
+    transition: var(--transition);
 }
 
-/* 响应式设计 */
+.toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 0.8rem 1.5rem;
+    border-radius: 6px;
+    z-index: 1000;
+    animation: toast-in-out 2s ease-in-out;
+}
+
+@keyframes toast-in-out {
+    0% {
+        transform: translate(-50%, 100%);
+        opacity: 0;
+    }
+    15% {
+        transform: translate(-50%, 0);
+        opacity: 1;
+    }
+    85% {
+        transform: translate(-50%, 0);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, 100%);
+        opacity: 0;
+    }
+}
+
 @media (max-width: 768px) {
     .container {
-        margin: 1rem;
+        margin: 0;
         padding: 1rem;
-    }
-
-    .upload-section {
-        flex-direction: column;
-    }
-
-    .file-label, .btn-test {
-        width: 100%;
-        justify-content: center;
+        border-radius: 0;
+        min-height: 100vh;
     }
 
     .button-group {
@@ -277,6 +409,73 @@ h2 {
 
     .btn {
         width: 100%;
-        justify-content: center;
     }
+
+    .preview-section, .result-section {
+        margin-top: 1.5rem;
+    }
+
+    .section-header {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: flex-start;
+    }
+
+    .preview-controls, .result-controls {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}
+
+.filename-dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--bg-light);
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px var(--shadow-color);
+    z-index: 1000;
+    width: 90%;
+    max-width: 400px;
+}
+
+.filename-dialog h3 {
+    margin-bottom: 1rem;
+    color: var(--text-color);
+}
+
+.filename-input {
+    width: 100%;
+    padding: 0.8rem;
+    margin-bottom: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 1rem;
+    background-color: var(--bg-light);
+    color: var(--text-color);
+}
+
+.filename-input:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+.dialog-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+}
+
+.dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px);
+    z-index: 999;
 }

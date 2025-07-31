@@ -17,6 +17,62 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let currentContent = '';
     let currentMode = 'file'; // 'file' 或 'text'
+    let currentOperation = ''; // 'encrypt' 或 'decrypt'
+    let processedContent = ''; // 存储加密或解密后的内容
+
+    // 创建文件名输入对话框
+    function createFilenameDialog() {
+        const dialog = document.createElement('div');
+        dialog.className = 'filename-dialog';
+        dialog.innerHTML = `
+            <h3>请输入文件名</h3>
+            <input type="text" class="filename-input" value="${getDefaultFilename()}" placeholder="请输入文件名">
+            <div class="dialog-buttons">
+                <button class="btn btn-icon" data-action="cancel">取消</button>
+                <button class="btn btn-download" data-action="save">保存</button>
+            </div>
+        `;
+
+        const overlay = document.createElement('div');
+        overlay.className = 'dialog-overlay';
+
+        document.body.appendChild(overlay);
+        document.body.appendChild(dialog);
+
+        const input = dialog.querySelector('.filename-input');
+        input.select();
+
+        return new Promise((resolve, reject) => {
+            dialog.addEventListener('click', e => {
+                const action = e.target.closest('button')?.dataset.action;
+                if (action === 'save') {
+                    const filename = input.value.trim() || getDefaultFilename();
+                    cleanup();
+                    resolve(filename);
+                } else if (action === 'cancel') {
+                    cleanup();
+                    reject();
+                }
+            });
+
+            overlay.addEventListener('click', () => {
+                cleanup();
+                reject();
+            });
+
+            function cleanup() {
+                dialog.remove();
+                overlay.remove();
+            }
+        });
+    }
+
+    // 获取默认文件名
+    function getDefaultFilename() {
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+        const operation = currentOperation === 'encrypt' ? '加密' : '解密';
+        return `${operation}_${timestamp}.md`;
+    }
 
     // 标签页切换
     tabBtns.forEach(btn => {
@@ -128,10 +184,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const encryptedContent = await encryptText(currentContent, key);
-            result.textContent = encryptedContent;
+            processedContent = await encryptText(currentContent, key);
+            result.textContent = processedContent;
             downloadBtn.style.display = 'block';
-            setupDownload(encryptedContent, 'encrypted.md');
+            currentOperation = 'encrypt';
+            setupDownload();
         } catch (error) {
             showToast('加密过程中发生错误：' + error.message);
         }
@@ -151,27 +208,66 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const decryptedContent = await decryptText(currentContent, key);
-            result.textContent = decryptedContent;
+            processedContent = await decryptText(currentContent, key);
+            result.textContent = processedContent;
             downloadBtn.style.display = 'block';
-            setupDownload(decryptedContent, 'decrypted.md');
+            currentOperation = 'decrypt';
+            setupDownload();
         } catch (error) {
             showToast('解密失败，请检查密钥是否正确');
         }
     });
 
     // 设置下载功能
-    function setupDownload(content, filename) {
-        downloadBtn.onclick = () => {
-            const blob = new Blob([content], { type: 'text/markdown' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+    function setupDownload() {
+        downloadBtn.onclick = async () => {
+            try {
+                // 检查是否支持 showSaveFilePicker API
+                if ('showSaveFilePicker' in window) {
+                    const opts = {
+                        suggestedName: getDefaultFilename(),
+                        types: [{
+                            description: 'Markdown 文件',
+                            accept: { 'text/markdown': ['.md'] }
+                        }]
+                    };
+
+                    try {
+                        const handle = await window.showSaveFilePicker(opts);
+                        const writable = await handle.createWritable();
+                        await writable.write(processedContent);
+                        await writable.close();
+                        showToast('文件保存成功');
+                    } catch (err) {
+                        if (err.name !== 'AbortError') {
+                            throw err;
+                        }
+                    }
+                } else {
+                    // 回退到传统下载方式
+                    try {
+                        const filename = await createFilenameDialog();
+                        const blob = new Blob([processedContent], { type: 'text/markdown' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = filename;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                        showToast('文件下载成功');
+                    } catch (err) {
+                        if (err) { // 忽略用户取消操作
+                            throw err;
+                        }
+                    }
+                }
+            } catch (error) {
+                if (error) { // 忽略用户取消操作
+                    showToast('文件保存失败：' + error.message);
+                }
+            }
         };
     }
 

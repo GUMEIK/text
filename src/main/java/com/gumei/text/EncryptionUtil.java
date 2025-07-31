@@ -156,12 +156,18 @@ public class EncryptionUtil {
         String decryptedFile = "decrypted.md";
         String password = "your-secure-password";
 
-        // 加密文件
-        encryptFile(inputFile, encryptedFile, password);
-        System.out.println("文件加密完成，已保存到: " + encryptedFile);
+//        // 加密文件
+//        encryptFile(inputFile, encryptedFile, password);
+//        System.out.println("文件加密完成，已保存到: " + encryptedFile);
+//
+//        // 解密文件
+//        decryptFile(encryptedFile, decryptedFile, password);
+//        System.out.println("文件解密完成，已保存到: " + decryptedFile);
 
-        // 解密文件
-        decryptFile(encryptedFile, decryptedFile, password);
-        System.out.println("文件解密完成，已保存到: " + decryptedFile);
+        String text = "8Iy5FLDXx6BwaWi/J8M0jC77tRofoTiSHJOUsKX2vhv1tbcI9FQFXRepLcT5giH48ZZCWuc5QK+QUCZvQ+LsoPNbQnFEmyKPweejKVV2T+8dzk9iy8uFpaP+7ms=";
+        String passwordText = "123";
+        String decrypt = decrypt(text, passwordText);
+        System.out.println("解密文本:" + decrypt);
     }
+
 }

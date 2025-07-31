@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown 文件加密/解密工具</title>
+    <style>
+:root {
+    --primary-color: #3498db;
+    --primary-dark: #2980b9;
+    --success-color: #2ecc71;
+    --success-dark: #27ae60;
+    --danger-color: #e74c3c;
+    --danger-dark: #c0392b;
+    --purple-color: #9b59b6;
+    --purple-dark: #8e44ad;
+    --text-color: #2c3e50;
+    --text-light: #666;
+    --bg-color: #f5f5f5;
+    --bg-light: #fff;
+    --border-color: #ddd;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s ease;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --text-color: #ecf0f1;
+        --text-light: #bdc3c7;
+        --bg-color: #2c3e50;
+        --bg-light: #34495e;
+        --border-color: #465670;
+        --shadow-color: rgba(0, 0, 0, 0.3);
+    }
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: var(--bg-color);
+    transition: var(--transition);
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: var(--bg-light);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px var(--shadow-color);
+    transition: var(--transition);
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: var(--text-color);
+    font-size: 1.8rem;
+    font-weight: 600;
+}
+
+.tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 0.5rem;
+}
+
+.tab-btn {
+    padding: 0.8rem 1.5rem;
+    border: none;
+    background: none;
+    color: var(--text-light);
+    cursor: pointer;
+    font-size: 1rem;
+    transition: var(--transition);
+    border-radius: 6px;
+    position: relative;
+}
+
+.tab-btn::after {
+    content: '';
+    position: absolute;
+    bottom: -0.5rem;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: var(--primary-color);
+    transform: scaleX(0);
+    transition: var(--transition);
+}
+
+.tab-btn:hover {
+    color: var(--primary-color);
+}
+
+.tab-btn.active {
+    color: var(--primary-color);
+}
+
+.tab-btn.active::after {
+    transform: scaleX(1);
+}
+
+.tab-content {
+    margin-bottom: 1.5rem;
+    opacity: 1;
+    transform: translateY(0);
+    transition: var(--transition);
+}
+
+.tab-content.hidden {
+    display: none;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.upload-section {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.file-input {
+    display: none;
+}
+
+.file-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.5rem;
+    background-color: var(--primary-color);
+    color: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+    width: 100%;
+    justify-content: center;
+}
+
+.file-label:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
+}
+
+.text-input-section {
+    margin-bottom: 1.5rem;
+}
+
+#textInput {
+    width: 100%;
+    min-height: 200px;
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 1rem;
+    resize: vertical;
+    font-family: inherit;
+    background-color: var(--bg-light);
+    color: var(--text-color);
+    transition: var(--transition);
+}
+
+#textInput:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+.key-section {
+    margin-bottom: 1.5rem;
+}
+
+.key-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.key-input {
+    width: 100%;
+    padding: 0.8rem;
+    padding-right: 40px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: var(--transition);
+    background-color: var(--bg-light);
+    color: var(--text-color);
+}
+
+.key-input:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    color: var(--text-light);
+    transition: var(--transition);
+}
+
+.toggle-password:hover {
+    color: var(--primary-color);
+}
+
+.button-group {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: var(--transition);
+    box-shadow: 0 2px 8px var(--shadow-color);
+    flex: 1;
+    justify-content: center;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+.btn-encrypt {
+    background-color: var(--success-color);
+    color: #fff;
+}
+
+.btn-encrypt:hover {
+    background-color: var(--success-dark);
+}
+
+.btn-decrypt {
+    background-color: var(--danger-color);
+    color: #fff;
+}
+
+.btn-decrypt:hover {
+    background-color: var(--danger-dark);
+}
+
+.btn-download {
+    background-color: var(--purple-color);
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-download:hover {
+    background-color: var(--purple-dark);
+}
+
+.btn-download::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    border-radius: 100%;
+    transform: scale(1, 1) translate(-50%);
+    transform-origin: 50% 50%;
+}
+
+.btn-download:active::after {
+    animation: ripple 0.6s ease-out;
+}
+
+@keyframes ripple {
+    0% {
+        transform: scale(0, 0);
+        opacity: 0.5;
+    }
+    100% {
+        transform: scale(20, 20);
+        opacity: 0;
+    }
+}
+
+.upload-icon, .test-icon, .eye-icon, .lock-icon, .unlock-icon, .copy-icon, .download-icon {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+    transition: var(--transition);
+}
+
+.preview-section, .result-section {
+    margin-top: 2rem;
+    opacity: 1;
+    transform: translateY(0);
+    transition: var(--transition);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+h2 {
+    color: var(--text-color);
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+.preview-controls, .result-controls {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-icon {
+    padding: 0.5rem;
+    background: none;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: var(--transition);
+    color: var(--text-light);
+}
+
+.btn-icon:hover {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+.preview-content, .result-content {
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    min-height: 200px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    background-color: var(--bg-light);
+    color: var(--text-color);
+    font-family: 'Fira Code', 'Consolas', monospace;
+    line-height: 1.5;
+    transition: var(--transition);
+}
+
+.toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 0.8rem 1.5rem;
+    border-radius: 6px;
+    z-index: 1000;
+    animation: toast-in-out 2s ease-in-out;
+}
+
+@keyframes toast-in-out {
+    0% {
+        transform: translate(-50%, 100%);
+        opacity: 0;
+    }
+    15% {
+        transform: translate(-50%, 0);
+        opacity: 1;
+    }
+    85% {
+        transform: translate(-50%, 0);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, 100%);
+        opacity: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        margin: 0;
+        padding: 1rem;
+        border-radius: 0;
+        min-height: 100vh;
+    }
+
+    .button-group {
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+    }
+
+    .preview-section, .result-section {
+        margin-top: 1.5rem;
+    }
+
+    .section-header {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: flex-start;
+    }
+
+    .preview-controls, .result-controls {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}
+
+.filename-dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--bg-light);
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px var(--shadow-color);
+    z-index: 1000;
+    width: 90%;
+    max-width: 400px;
+}
+
+.filename-dialog h3 {
+    margin-bottom: 1rem;
+    color: var(--text-color);
+}
+
+.filename-input {
+    width: 100%;
+    padding: 0.8rem;
+    margin-bottom: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 1rem;
+    background-color: var(--bg-light);
+    color: var(--text-color);
+}
+
+.filename-input:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+.dialog-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+}
+
+.dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px);
+    z-index: 999;
+}
+</style>
+</head>
+<body>
+    <div class="container">
+        <h1>Markdown 文件加密/解密工具</h1>
+        
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="file">文件模式</button>
+            <button class="tab-btn" data-tab="text">文本模式</button>
+        </div>
+
+        <div class="tab-content" id="fileTab">
+            <div class="upload-section">
+                <input type="file" id="fileInput" accept=".md" class="file-input">
+                <label for="fileInput" class="file-label">
+                    <svg class="upload-icon" viewBox="0 0 24 24">
+                        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                    </svg>
+                    选择 Markdown 文件
+                </label>
+            </div>
+        </div>
+
+        <div class="tab-content hidden" id="textTab">
+            <div class="text-input-section">
+                <textarea id="textInput" placeholder="在此输入或粘贴 Markdown 文本..."></textarea>
+            </div>
+        </div>
+
+        <div class="key-section">
+            <div class="key-wrapper">
+                <input type="password" id="keyInput" placeholder="请输入加密密钥" class="key-input">
+                <button id="togglePassword" class="toggle-password" type="button">
+                    <svg class="eye-icon" viewBox="0 0 24 24">
+                        <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button id="encryptBtn" class="btn btn-encrypt">
+                <svg class="lock-icon" viewBox="0 0 24 24">
+                    <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+                </svg>
+                加密
+            </button>
+            <button id="decryptBtn" class="btn btn-decrypt">
+                <svg class="unlock-icon" viewBox="0 0 24 24">
+                    <path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6h1.9c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm0 12H6V10h12v10z"/>
+                </svg>
+                解密
+            </button>
+        </div>
+
+        <div class="preview-section">
+            <div class="section-header">
+                <h2>文件内容预览</h2>
+                <div class="preview-controls">
+                    <button id="copyPreview" class="btn btn-icon" title="复制内容">
+                        <svg class="copy-icon" viewBox="0 0 24 24">
+                            <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div id="preview" class="preview-content"></div>
+        </div>
+
+        <div class="result-section">
+            <div class="section-header">
+                <h2>结果</h2>
+                <div class="result-controls">
+                    <button id="copyResult" class="btn btn-icon" title="复制结果">
+                        <svg class="copy-icon" viewBox="0 0 24 24">
+                            <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                        </svg>
+                    </button>
+                    <button id="downloadBtn" class="btn btn-download" style="display: none;">
+                        <svg class="download-icon" viewBox="0 0 24 24">
+                            <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                        </svg>
+                        下载结果
+                    </button>
+                </div>
+            </div>
+            <div id="result" class="result-content"></div>
+        </div>
+    </div>
+    <script>
+document.addEventListener('DOMContentLoaded', () => {
+    // 获取DOM元素
+    const fileInput = document.getElementById('fileInput');
+    const textInput = document.getElementById('textInput');
+    const keyInput = document.getElementById('keyInput');
+    const encryptBtn = document.getElementById('encryptBtn');
+    const decryptBtn = document.getElementById('decryptBtn');
+    const preview = document.getElementById('preview');
+    const result = document.getElementById('result');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const loadTestFile = document.getElementById('loadTestFile');
+    const togglePassword = document.getElementById('togglePassword');
+    const copyPreview = document.getElementById('copyPreview');
+    const copyResult = document.getElementById('copyResult');
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    let currentContent = '';
+    let currentMode = 'file'; // 'file' 或 'text'
+    let currentOperation = ''; // 'encrypt' 或 'decrypt'
+    let processedContent = ''; // 存储加密或解密后的内容
+
+    // 创建文件名输入对话框
+    function createFilenameDialog() {
+        const dialog = document.createElement('div');
+        dialog.className = 'filename-dialog';
+        dialog.innerHTML = `
+            <h3>请输入文件名</h3>
+            <input type="text" class="filename-input" value="${getDefaultFilename()}" placeholder="请输入文件名">
+            <div class="dialog-buttons">
+                <button class="btn btn-icon" data-action="cancel">取消</button>
+                <button class="btn btn-download" data-action="save">保存</button>
+            </div>
+        `;
+
+        const overlay = document.createElement('div');
+        overlay.className = 'dialog-overlay';
+
+        document.body.appendChild(overlay);
+        document.body.appendChild(dialog);
+
+        const input = dialog.querySelector('.filename-input');
+        input.select();
+
+        return new Promise((resolve, reject) => {
+            dialog.addEventListener('click', e => {
+                const action = e.target.closest('button')?.dataset.action;
+                if (action === 'save') {
+                    const filename = input.value.trim() || getDefaultFilename();
+                    cleanup();
+                    resolve(filename);
+                } else if (action === 'cancel') {
+                    cleanup();
+                    reject();
+                }
+            });
+
+            overlay.addEventListener('click', () => {
+                cleanup();
+                reject();
+            });
+
+            function cleanup() {
+                dialog.remove();
+                overlay.remove();
+            }
+        });
+    }
+
+    // 获取默认文件名
+    function getDefaultFilename() {
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+        const operation = currentOperation === 'encrypt' ? '加密' : '解密';
+        return `${operation}_${timestamp}.md`;
+    }
+
+    // 标签页切换
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const targetTab = btn.dataset.tab;
+            
+            // 更新按钮状态
+            tabBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            // 更新内容显示
+            tabContents.forEach(content => {
+                if (content.id === targetTab + 'Tab') {
+                    content.classList.remove('hidden');
+                } else {
+                    content.classList.add('hidden');
+                }
+            });
+            
+            currentMode = targetTab;
+            updatePreview();
+        });
+    });
+
+    // 密码显示切换
+    togglePassword.addEventListener('click', () => {
+        const type = keyInput.type === 'password' ? 'text' : 'password';
+        keyInput.type = type;
+        togglePassword.innerHTML = type === 'password' ? 
+            '<svg class="eye-icon" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>' :
+            '<svg class="eye-icon" viewBox="0 0 24 24"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/></svg>';
+    });
+
+    // 复制按钮功能
+    copyPreview.addEventListener('click', () => copyToClipboard(preview.textContent, '预览内容'));
+    copyResult.addEventListener('click', () => copyToClipboard(result.textContent, '结果内容'));
+
+    // 复制到剪贴板
+    async function copyToClipboard(text, type) {
+        try {
+            await navigator.clipboard.writeText(text);
+            showToast(`${type}已复制到剪贴板`);
+        } catch (err) {
+            showToast('复制失败，请手动复制');
+        }
+    }
+
+    // 显示提示信息
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.textContent = message;
+        toast.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            z-index: 1000;
+        `;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2000);
+    }
+
+    // 文件选择处理
+    fileInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        try {
+            currentContent = await file.text();
+            updatePreview();
+            result.textContent = '';
+            downloadBtn.style.display = 'none';
+        } catch (error) {
+            showToast('读取文件失败：' + error.message);
+        }
+    });
+
+    // 文本输入处理
+    textInput.addEventListener('input', (e) => {
+        currentContent = e.target.value;
+        updatePreview();
+    });
+
+    // 更新预览内容
+    function updatePreview() {
+        if (currentMode === 'file') {
+            preview.textContent = currentContent;
+        } else {
+            preview.textContent = textInput.value;
+            currentContent = textInput.value;
+        }
+    }
+
+    // 加密功能
+    encryptBtn.addEventListener('click', async () => {
+        if (!currentContent) {
+            showToast('请先选择文件或输入文本');
+            return;
+        }
+
+        const key = keyInput.value;
+        if (!key) {
+            showToast('请输入加密密钥');
+            return;
+        }
+
+        try {
+            processedContent = await encryptText(currentContent, key);
+            result.textContent = processedContent;
+            downloadBtn.style.display = 'block';
+            currentOperation = 'encrypt';
+            setupDownload();
+        } catch (error) {
+            showToast('加密过程中发生错误：' + error.message);
+        }
+    });
+
+    // 解密功能
+    decryptBtn.addEventListener('click', async () => {
+        if (!currentContent) {
+            showToast('请先选择文件或输入文本');
+            return;
+        }
+
+        const key = keyInput.value;
+        if (!key) {
+            showToast('请输入解密密钥');
+            return;
+        }
+
+        try {
+            processedContent = await decryptText(currentContent, key);
+            result.textContent = processedContent;
+            downloadBtn.style.display = 'block';
+            currentOperation = 'decrypt';
+            setupDownload();
+        } catch (error) {
+            showToast('解密失败，请检查密钥是否正确');
+        }
+    });
+
+    // 设置下载功能
+    function setupDownload() {
+        downloadBtn.onclick = async () => {
+            try {
+                // 检查是否支持 showSaveFilePicker API
+                if ('showSaveFilePicker' in window) {
+                    const opts = {
+                        suggestedName: getDefaultFilename(),
+                        types: [{
+                            description: 'Markdown 文件',
+                            accept: { 'text/markdown': ['.md'] }
+                        }]
+                    };
+
+                    try {
+                        const handle = await window.showSaveFilePicker(opts);
+                        const writable = await handle.createWritable();
+                        await writable.write(processedContent);
+                        await writable.close();
+                        showToast('文件保存成功');
+                    } catch (err) {
+                        if (err.name !== 'AbortError') {
+                            throw err;
+                        }
+                    }
+                } else {
+                    // 回退到传统下载方式
+                    try {
+                        const filename = await createFilenameDialog();
+                        const blob = new Blob([processedContent], { type: 'text/markdown' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = filename;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                        showToast('文件下载成功');
+                    } catch (err) {
+                        if (err) { // 忽略用户取消操作
+                            throw err;
+                        }
+                    }
+                }
+            } catch (error) {
+                if (error) { // 忽略用户取消操作
+                    showToast('文件保存失败：' + error.message);
+                }
+            }
+        };
+    }
+
+    // 加密文本
+    async function encryptText(text, key) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(text);
+        
+        // 从密钥生成加密密钥
+        const keyMaterial = await window.crypto.subtle.importKey(
+            'raw',
+            encoder.encode(key),
+            { name: 'PBKDF2' },
+            false,
+            ['deriveBits', 'deriveKey']
+        );
+
+        // 生成随机盐值
+        const salt = window.crypto.getRandomValues(new Uint8Array(16));
+        
+        // 生成加密密钥
+        const cryptoKey = await window.crypto.subtle.deriveKey(
+            {
+                name: 'PBKDF2',
+                salt: salt,
+                iterations: 100000,
+                hash: 'SHA-256'
+            },
+            keyMaterial,
+            { name: 'AES-GCM', length: 256 },
+            false,
+            ['encrypt']
+        );
+
+        // 生成随机 IV
+        const iv = window.crypto.getRandomValues(new Uint8Array(12));
+        
+        // 加密数据
+        const encryptedContent = await window.crypto.subtle.encrypt(
+            {
+                name: 'AES-GCM',
+                iv: iv
+            },
+            cryptoKey,
+            data
+        );
+
+        // 组合加密数据、盐值和 IV
+        const encryptedArray = new Uint8Array(encryptedContent);
+        const combinedArray = new Uint8Array(salt.length + iv.length + encryptedArray.length);
+        combinedArray.set(salt, 0);
+        combinedArray.set(iv, salt.length);
+        combinedArray.set(encryptedArray, salt.length + iv.length);
+
+        // 转换为 Base64 字符串
+        return btoa(String.fromCharCode.apply(null, combinedArray));
+    }
+
+    // 解密文本
+    async function decryptText(encryptedText, key) {
+        try {
+            // 解码 Base64 字符串
+            const encryptedArray = new Uint8Array(atob(encryptedText).split('').map(char => char.charCodeAt(0)));
+            
+            // 提取盐值、IV 和加密数据
+            const salt = encryptedArray.slice(0, 16);
+            const iv = encryptedArray.slice(16, 28);
+            const data = encryptedArray.slice(28);
+
+            const encoder = new TextEncoder();
+            
+            // 从密钥生成加密密钥
+            const keyMaterial = await window.crypto.subtle.importKey(
+                'raw',
+                encoder.encode(key),
+                { name: 'PBKDF2' },
+                false,
+                ['deriveBits', 'deriveKey']
+            );
+
+            // 生成解密密钥
+            const cryptoKey = await window.crypto.subtle.deriveKey(
+                {
+                    name: 'PBKDF2',
+                    salt: salt,
+                    iterations: 100000,
+                    hash: 'SHA-256'
+                },
+                keyMaterial,
+                { name: 'AES-GCM', length: 256 },
+                false,
+                ['decrypt']
+            );
+
+            // 解密数据
+            const decryptedContent = await window.crypto.subtle.decrypt(
+                {
+                    name: 'AES-GCM',
+                    iv: iv
+                },
+                cryptoKey,
+                data
+            );
+
+            // 转换为文本
+            return new TextDecoder().decode(decryptedContent);
+        } catch (error) {
+            throw new Error('解密失败，请检查密钥是否正确');
+        }
+    }
+});
+</script>
+</body>
+</html>
