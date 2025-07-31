@@ -1,6 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     // 获取DOM元素
     const fileInput = document.getElementById('fileInput');
+    const pasteBtn = document.getElementById('pasteBtn');
+    const resetBtn = document.getElementById('resetBtn');
     const textInput = document.getElementById('textInput');
     const keyInput = document.getElementById('keyInput');
     const encryptBtn = document.getElementById('encryptBtn');
@@ -158,6 +160,69 @@ document.addEventListener('DOMContentLoaded', () => {
     textInput.addEventListener('input', (e) => {
         currentContent = e.target.value;
         updatePreview();
+    });
+
+    // 重置按钮功能
+    resetBtn.addEventListener('click', () => {
+        if (!textInput.value.trim()) {
+            showToast('文本框已经是空的了');
+            return;
+        }
+        
+        textInput.value = '';
+        currentContent = '';
+        updatePreview();
+        result.textContent = '';
+        downloadBtn.style.display = 'none';
+        
+        // 添加晃动动画
+        textInput.classList.add('shake-animation');
+        setTimeout(() => {
+            textInput.classList.remove('shake-animation');
+        }, 300);
+        
+        showToast('内容已重置');
+    });
+
+    // 从剪贴板导入功能
+    pasteBtn.addEventListener('click', async () => {
+        try {
+            // 请求剪贴板权限
+            const permission = await navigator.permissions.query({ name: 'clipboard-read' });
+            
+            if (permission.state === 'denied') {
+                showToast('无法访问剪贴板，请检查浏览器权限设置');
+                return;
+            }
+
+            const text = await navigator.clipboard.readText();
+            
+            if (!text.trim()) {
+                showToast('剪贴板内容为空');
+                return;
+            }
+
+            textInput.value = text;
+            currentContent = text;
+            updatePreview();
+            result.textContent = '';
+            downloadBtn.style.display = 'none';
+
+            // 添加成功反馈动画
+            textInput.style.transition = 'background-color 0.3s ease';
+            textInput.style.backgroundColor = 'rgba(46, 204, 113, 0.1)';
+            setTimeout(() => {
+                textInput.style.backgroundColor = '';
+            }, 500);
+
+            showToast('已从剪贴板导入内容');
+        } catch (error) {
+            if (error.name === 'NotAllowedError') {
+                showToast('剪贴板访问被拒绝，请允许网站访问剪贴板');
+            } else {
+                showToast('读取剪贴板失败：' + error.message);
+            }
+        }
     });
 
     // 更新预览内容
